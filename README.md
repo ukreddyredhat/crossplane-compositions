@@ -1,7 +1,7 @@
 # crossplane-compositions
 ### Pre-requisite
-oc cli
-argocd cli
+oc cli  
+argocd cli  
 
 ### 
 1. Login to OpenShift using the below command
