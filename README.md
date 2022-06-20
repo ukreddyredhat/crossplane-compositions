@@ -3,7 +3,7 @@
 oc cli  
 argocd cli  
 
-### 
+### Steps
 1. Login to OpenShift using the below command
     oc login --token=<your-token> --server=https://api.arcaroytxry.westus2.aroapp.io:6443
 
