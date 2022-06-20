@@ -1,7 +1,7 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: azurecosmosdb
+  name: azure-cosmosdb-xrc
   labels:
     crossplane.io/xrd: xdocumentdatabases.runtime.cariad.net
     provider: azure
