@@ -1,0 +1,138 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: azurecosmosdb
+  labels:
+    crossplane.io/xrd: xdocumentdatabases.runtime.cariad.net
+    provider: azure
+spec:
+  writeConnectionSecretsToNamespace: wireless-car
+  compositeTypeRef:
+    apiVersion: runtime.cariad.net/v1alpha1
+    kind: XDocumentDatabase
+  resources:
+  - name: cosmosdb-account
+    base:
+      apiVersion: cosmosdb.azure.jet.crossplane.io/v1alpha2
+      kind: Account
+      spec:
+        forProvider: # CosmosDBAccountParameters define the desired state of an Azure CosmosDB account.
+          kind: GlobalDocumentDB # (Optional) Specifies the Kind of CosmosDB to create - possible values are GlobalDocumentDB and MongoDB. Defaults to GlobalDocumentDB
+          # location:  "East US" # (Required) Specifies the supported Azure location where the resource exists.
+          offerType: Standard # (Required) Specifies the Offer Type to use for this CosmosDB Account - currently this can only be set to Standard.
+          backup: # A backup block supports the following:
+          - type: Continuous # (Required) The type of the backup. Possible values are Continuous and Periodic. Defaults to Periodic. 
+          consistencyPolicy:
+          - consistencyLevel: Session # The default consistency level and configuration settings of the Cosmos DB account. Possible values include: 'Eventual', 'Session', 'BoundedStaleness', 'Strong', 'ConsistentPrefix'
+          # resourceGroupName: dev-mod-accenture-crossplane-rg # resource group name
+          geoLocation:
+          - failoverPriority: 0 # A failover priority of 0 indicates a write region. The maximum value for a failover priority = (total number of regions - 1). Failover priority values must be unique for each of the regions in which the database account exists.
+            # location: "East US"
+            # zoneRedundant: False  # indicate whether or not this region is an AvailabilityZone region 
+        providerConfigRef:
+          name: wireless-car # provider name
+        writeConnectionSecretToRef:
+          # name: conn-residency-cosmossql # secret name
+          namespace: wireless-car # OpenShift project
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: "metadata.uid"
+      toFieldPath: "spec.writeConnectionSecretToRef.name"
+      transforms:
+        - type: string
+          string:
+            fmt: "%s-cosmosdb-conn"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroup
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.location
+      toFieldPath: spec.forProvider.location
+      transforms:
+      - type: map
+        map:
+          us-west: West US
+          us-east: East US
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.location
+      toFieldPath: spec.forProvider.geoLocation[0].location
+      transforms:
+      - type: map
+        map:
+          us-west: West US
+          us-east: East US
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: metadata.annotations[crossplane.io/external-name]
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-account"
+    connectionDetails:
+    - name: primary_connection
+      fromConnectionSecretKey: primary_connection
+    - name: primary_readonly_connection
+      fromConnectionSecretKey: primary_readonly_connection
+    - name: secondary_connection
+      fromConnectionSecretKey: secondary_connection
+    - name: secondary_readonly_connection
+      fromConnectionSecretKey: secondary_readonly_connection
+  - name: cosmosdb-sqldatabase
+    base:
+      apiVersion: cosmosdb.azure.jet.crossplane.io/v1alpha2
+      kind: SQLDatabase
+      spec:
+        forProvider:
+          accountNameSelector:
+            matchControllerRef: true
+          throughput: 400
+        providerConfigRef:
+          name: wireless-car
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroup
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: metadata.annotations[crossplane.io/external-name]
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-database"
+  - name: cosmosdb-sqlcontainer
+    base:
+      apiVersion: cosmosdb.azure.jet.crossplane.io/v1alpha2
+      kind: SQLContainer
+      spec:
+        forProvider:
+          accountNameSelector:
+            matchControllerRef: true
+          databaseNameSelector:
+            matchControllerRef: true
+          indexingPolicy:
+          - excludedPath:
+            - path: /excluded/?
+            includedPath:
+            - path: /*
+            - path: /included/?
+            indexingMode: Consistent
+          partitionKeyPath: /definition/id
+          partitionKeyVersion: 1
+          throughput: 400
+          uniqueKey:
+          - paths:
+            - /definition/idlong
+            - /definition/idshort
+        providerConfigRef:
+          name: wireless-car
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroup
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: metadata.annotations[crossplane.io/external-name]
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-container"

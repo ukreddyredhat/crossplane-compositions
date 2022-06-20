@@ -1,0 +1,15 @@
+apiVersion: runtime.cariad.net/v1alpha1
+kind: DocumentDatabase
+metadata:
+  name: residency-cosmosdb-demo
+  annotations:
+    crossplane.io/external-name: residency-cosmossqldb
+spec:
+  parameters:
+    location: "us-west"
+    resourceGroup: "dev-mod-accenture-crossplane-rg"
+  compositionSelector:
+    matchLabels:
+      provider: azure
+  writeConnectionSecretToRef:
+    name: my-documentdb-connection

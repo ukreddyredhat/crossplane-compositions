@@ -1,0 +1,41 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xdocumentdatabases.runtime.cariad.net
+spec:
+  group: runtime.cariad.net
+  names:
+    kind: XDocumentDatabase
+    plural: xdocumentdatabases
+  claimNames:
+    kind: DocumentDatabase
+    plural: documentdatabases
+  connectionSecretKeys:
+    - primary_connection
+    - primary_readonly_connection
+    - secondary_connection
+    - secondary_readonly_connection
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  resourceGroup:
+                    type: string
+                  location:
+                    type: string
+                    enum: ["us-west", "us-east"]
+                required:
+                - resourceGroup
+                - location
+            required:
+            - parameters
