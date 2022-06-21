@@ -1,0 +1,42 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xkeyvaults.runtime.cariad.net
+spec:
+  group: runtime.cariad.net
+  names:
+    kind: XKeyVault
+    plural: xkeyvaults
+  claimNames:
+    kind: KeyVault
+    plural: keyvaults
+  connectionSecretKeys:
+    - uri
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  resourceGroup:
+                    type: string
+                  location:
+                    type: string
+                    enum: ["us-west", "us-east"]
+                  environment:
+                    type: string
+                    enum: ["dev", "stage", "prod"]
+                required:
+                - resourceGroup
+                - location
+                - environment
+            required:
+            - parameters

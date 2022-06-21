@@ -1,15 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: azure-cosmosdb-xrc
+  name: azure-cosmosdb-composition
   labels:
     crossplane.io/xrd: xdocumentdatabases.runtime.cariad.net
     provider: azure
 spec:
-  writeConnectionSecretsToNamespace: wireless-car
   compositeTypeRef:
     apiVersion: runtime.cariad.net/v1alpha1
     kind: XDocumentDatabase
+  writeConnectionSecretsToNamespace: upbound-system
   resources:
   - name: cosmosdb-account
     base:
@@ -24,16 +24,16 @@ spec:
           - type: Continuous # (Required) The type of the backup. Possible values are Continuous and Periodic. Defaults to Periodic. 
           consistencyPolicy:
           - consistencyLevel: Session # The default consistency level and configuration settings of the Cosmos DB account. Possible values include: 'Eventual', 'Session', 'BoundedStaleness', 'Strong', 'ConsistentPrefix'
-          # resourceGroupName: dev-mod-accenture-crossplane-rg # resource group name
+          resourceGroupName: replaced-by-patches # resource group name
           geoLocation:
           - failoverPriority: 0 # A failover priority of 0 indicates a write region. The maximum value for a failover priority = (total number of regions - 1). Failover priority values must be unique for each of the regions in which the database account exists.
-            # location: "East US"
+            # location: "East US" # replaced by patches
             # zoneRedundant: False  # indicate whether or not this region is an AvailabilityZone region 
         providerConfigRef:
-          name: wireless-car # provider name
+          name: replaced-by-patches # provider name
         writeConnectionSecretToRef:
-          # name: conn-residency-cosmossql # secret name
-          namespace: wireless-car # OpenShift project
+          name: replaced-by-patches # secret name
+          namespace: replaced-by-patches # OpenShift project
     patches:
     - type: FromCompositeFieldPath
       fromFieldPath: "metadata.uid"
@@ -42,6 +42,13 @@ spec:
         - type: string
           string:
             fmt: "%s-cosmosdb-conn"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.writeConnectionSecretToRef.namespace
+    - fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+      policy:
+        fromFieldPath: Required
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.resourceGroup
       toFieldPath: spec.forProvider.resourceGroupName
@@ -87,8 +94,12 @@ spec:
             matchControllerRef: true
           throughput: 400
         providerConfigRef:
-          name: wireless-car
+          name: replaced-by-patches
     patches:
+    - fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+      policy:
+        fromFieldPath: Required
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.resourceGroup
       toFieldPath: spec.forProvider.resourceGroupName
@@ -124,8 +135,12 @@ spec:
             - /definition/idlong
             - /definition/idshort
         providerConfigRef:
-          name: wireless-car
+          name: replaced-by-patches
     patches:
+    - fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+      policy:
+        fromFieldPath: Required
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.resourceGroup
       toFieldPath: spec.forProvider.resourceGroupName

@@ -1,0 +1,16 @@
+apiVersion: runtime.cariad.net/v1alpha1
+kind: KeyVault
+metadata:
+  name: keyvault
+  annotations:
+    crossplane.io/external-name: residency-keyvault
+spec:
+  parameters:
+    location: us-west
+    resourceGroup: dev-mod-accenture-crossplane-rg
+    environment: dev
+  compositionSelector:
+    matchLabels:
+      provider: azure
+  writeConnectionSecretToRef:
+    name: my-vault-connection

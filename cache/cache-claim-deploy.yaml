@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cache-claim
+  namespace: openshift-gitops # this is mandatory default namespace, where ArgoCD is installed. Do not need to change this
+spec:
+  destination:
+    namespace: wireless-car # namespace / project in OpenShift for developers, where the app should be deployed
+    server: 'https://kubernetes.default.svc'
+  orphanedResources:
+    warn: false
+  project: default # your respective ArgoCd project where you want to deploy your application
+  source:
+    path: cache/dev # this your deployment configuration files path/directory
+    repoURL: 'https://github.com/cariad-cloud/crossplane-compositions.git' # this is your GitHub repo
+    targetRevision: master
+  syncPolicy:
+    syncOptions:
+      #- ApplyOutOfSyncOnly=true
+      - CreateNamespace=false
+      #- PruneLast=true
+      #- PrunePropagationPolicy=foreground
+      #- Replace=true
+      #- FailOnSharedResource=true
+    automated:
+      prune: false
+      allowEmpty: true
+      selfHeal: false
+    always:
+      frequency: 5m
+      retry: false
