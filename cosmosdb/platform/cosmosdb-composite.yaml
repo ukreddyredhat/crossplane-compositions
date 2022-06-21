@@ -70,13 +70,13 @@ spec:
           fmt: "%s-account"
     connectionDetails:
     - name: primary_connection
-      fromConnectionSecretKey: primary_connection
+      fromConnectionSecretKey: attribute.primary_connection
     - name: primary_readonly_connection
-      fromConnectionSecretKey: primary_readonly_connection
+      fromConnectionSecretKey: attribute.primary_readonly_connection
     - name: secondary_connection
-      fromConnectionSecretKey: secondary_connection
+      fromConnectionSecretKey: attribute.secondary_connection
     - name: secondary_readonly_connection
-      fromConnectionSecretKey: secondary_readonly_connection
+      fromConnectionSecretKey: attribute.secondary_readonly_connection
   - name: cosmosdb-sqldatabase
     base:
       apiVersion: cosmosdb.azure.jet.crossplane.io/v1alpha2
