@@ -13,7 +13,7 @@ spec:
   source:
     path: cache/dev # this your deployment configuration files path/directory
     repoURL: 'https://github.com/cariad-cloud/crossplane-compositions.git' # this is your GitHub repo
-    targetRevision: master
+    targetRevision: main
   syncPolicy:
     syncOptions:
       #- ApplyOutOfSyncOnly=true
