@@ -16,10 +16,10 @@ argocd login --insecure --grpc-web openshift-gitops-server-openshift-gitops.apps
 
 3. Deploy the `CompositeResourceDefinition` and `Composition`
 ```
-oc apply -f cosmosdb/cosmosdb-composite-deploy.yaml
+oc apply -f <resource>/<resource>-composite-deploy.yaml
 ```   
 
 4. Deploy the `Claim`
 ```
-oc apply -f cosmosdb/cosmosdb-claim-deploy.yaml
+oc apply -f <resource>/<resource>-claim-deploy.yaml
 ```
