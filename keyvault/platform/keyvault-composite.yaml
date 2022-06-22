@@ -33,10 +33,6 @@ spec:
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
       toFieldPath: metadata.annotations[crossplane.io/external-name]
-      transforms:
-      - type: string
-          string:
-            fmt: "%s-vault"
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.uid
       toFieldPath: spec.writeConnectionSecretToRef.name
@@ -82,48 +78,47 @@ spec:
     base:
       apiVersion: keyvault.azure.jet.crossplane.io/v1alpha2
       kind: AccessPolicy
+      metadata:
+        name: residency-vaultpolicy
       spec:
         forProvider:
           keyVaultIdSelector:
             matchControllerRef: true
-          tenantId: ${data.azurerm_client_config.current.tenant_id}
-          objectId: ${data.azurerm_client_config.current.object_id}
+
+          keyPermissions:
+            - Get
+            - Create
+            - Delete
+            - List
+          tenantId: 2d8cc149-4c57-462b-a1fb-6e548ffd73bd
+          objectId: 4d9fff78-492d-4136-affd-a0c430ea7902
           certificatePermissions:
-          - Get
-          - GetIssuers
-          - Create
-          - SetIssuers
-          - Delete
-          - DeleteIssuers
-          - List
-          - ListIssuers
+            - Get
+            - GetIssuers
+            - Create
+            - SetIssuers
+            - Delete
+            - DeleteIssuers
+            - List
+            - ListIssuers
           secretPermissions:
-          - Get
-          - Set
-          - Delete
-          - List
+            - Get
+            - Set
+            - Delete
+            - List
           storagePermissions:
-          - Get
-          - Set
-          - Delete
-          - List
-          - SetSAS
-          - GetSAS
-          - DeleteSAS
-          - RegenerateKey
+            - Get
+            - Set
+            - Delete
+            - List
+            - SetSAS
+            - GetSAS
+            - DeleteSAS
+            - RegenerateKey
         providerConfigRef:
-          name: replaced-by-patches
+          name: wireless-car
     patches:
-    - type: FromCompositeFieldPath
-      fromFieldPath: metadata.annotations[crossplane.io/external-name]
-      toFieldPath: metadata.annotations[crossplane.io/external-name]
-      transforms:
-      - type: string
-          string:
-            fmt: "%s-accesspolicy"
     - fromFieldPath: spec.claimRef.namespace
       toFieldPath: spec.providerConfigRef.name
       policy:
         fromFieldPath: Required
-
-      
