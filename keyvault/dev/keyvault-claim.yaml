@@ -1,9 +1,9 @@
 apiVersion: runtime.cariad.net/v1alpha1
 kind: KeyVault
 metadata:
-  name: keyvault-1
+  name: keyvault-demo
   annotations:
-    crossplane.io/external-name: residency-keyvault-1
+    crossplane.io/external-name: residency-keyvault-demo
 spec:
   parameters:
     location: us-west
