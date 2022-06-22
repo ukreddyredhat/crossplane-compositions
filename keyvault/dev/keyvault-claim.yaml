@@ -3,7 +3,7 @@ kind: KeyVault
 metadata:
   name: keyvault
   annotations:
-    crossplane.io/external-name: residency-keyvault
+    crossplane.io/external-name: residency-keyvault-demo1
 spec:
   parameters:
     location: us-west
