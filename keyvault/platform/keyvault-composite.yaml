@@ -11,7 +11,7 @@ spec:
     kind: XKeyVault
   writeConnectionSecretsToNamespace: upbound-system
   resources:
-  - name: keyvault
+  - name: keyvault-1
     base:
       apiVersion: keyvault.azure.jet.crossplane.io/v1alpha2
       kind: Vault
