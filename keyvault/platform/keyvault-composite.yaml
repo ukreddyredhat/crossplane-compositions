@@ -85,7 +85,7 @@ spec:
       spec:
         forProvider:
           keyVaultIdSelector:
-              MatchControllerRef: true
+            MatchControllerRef: true
           tenantId: 2d8cc149-4c57-462b-a1fb-6e548ffd73bd
           objectId: 4d9fff78-492d-4136-affd-a0c430ea7902
           certificatePermissions:
