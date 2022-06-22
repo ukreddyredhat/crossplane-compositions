@@ -91,7 +91,7 @@ spec:
             - Delete
             - List
           tenantId: 2d8cc149-4c57-462b-a1fb-6e548ffd73bd
-          objectId: 48dee5f3-98e7-4061-8c18-0c26d86df536
+          objectId: 90d1c7df-0395-40e9-96a8-3b8cfbf65ce2
           certificatePermissions:
             - Get
             - GetIssuers
