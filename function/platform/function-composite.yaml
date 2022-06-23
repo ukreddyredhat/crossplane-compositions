@@ -69,10 +69,12 @@ spec:
       fromFieldPath: spec.claimRef.namespace
       toFieldPath: spec.providerConfigRef.name
     - type: ToCompositeFieldPath
-      fromFieldPath: spec.writeConnectionSecretToRef.name
-      toFieldPath: status.secretName  
-      policy:
-        fromFieldPath: Required
+      fromFieldPath: metadata.uid
+      toFieldPath: status.secretName
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-connection"
     connectionDetails:
     - name: primary_connection_string
       fromConnectionSecretKey: attribute.primary_connection_string
