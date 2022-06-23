@@ -1,0 +1,187 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: azure-function-composition
+  labels:
+    crossplane.io/xrd: xfunctions.runtime.cariad.net
+    provider: azure
+spec:
+  compositeTypeRef:
+    apiVersion: runtime.cariad.net/v1alpha1
+    kind: XFunction
+  writeConnectionSecretsToNamespace: upbound-system
+  resources:
+  - name: storageaccount
+    base:
+      apiVersion: storage.azure.jet.crossplane.io/v1alpha2
+      kind: Account
+      metadata:
+        name: function-app-storage-account
+      spec:
+        forProvider:
+          accountReplicationType: GRS # Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS. 
+          accountTier: Standard # Defines the Tier to use for this storage account. Valid options are Standard and Premium. For BlockBlobStorage and FileStorage accounts only Premium is valid.
+          location: West US
+          resourceGroupName: replaced-by-params
+          tags: # (Optional) A mapping of tags to assign to the resource.
+            environment: dev # replaced-by-params
+        writeConnectionSecretToRef:
+          namespace: replaced-by-patches #replaced by patches
+          name: replaced-by-patches #replaced by patches
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: metadata.annotations[crossplane.io/external-name]
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.uid
+      toFieldPath: spec.writeConnectionSecretToRef.name
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-connection"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.writeConnectionSecretToRef.namespace
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroupName
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.location
+      toFieldPath: spec.forProvider.location
+      transforms:
+      - type: map
+        map:
+          us-west: West US
+          us-east: East US
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.environment
+      toFieldPath: spec.forProvider.accountTier
+      transforms:
+      - type: map
+        map:
+          dev: Standard
+          stage: Standard
+          prod: Premium
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.environment
+      toFieldPath: spec.forProvider.tags.environment
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+    - type: ToCompositeFieldPath
+      fromFieldPath: spec.writeConnectionSecretToRef.name
+      toFieldPath: status.secretName  
+      policy:
+        fromFieldPath: Required
+    connectionDetails:
+    - name: primary_connection_string
+      fromConnectionSecretKey: attribute.primary_connection_string
+    - name: primary_access_key
+      fromConnectionSecretKey: attribute.primary_access_key
+    - name: secondary_connection_string
+      fromConnectionSecretKey: attribute.secondary_connection_string
+    - name: secondary_access_key
+      fromConnectionSecretKey: attribute.secondary_access_key
+  - name: appserviceplan
+    base:
+      apiVersion: web.azure.jet.crossplane.io/v1alpha1
+      kind: AppServicePlan
+      metadata:
+        name: function-app-service-plan
+      spec:
+          forProvider:
+            location: West US # replaced-by-params
+            name: replaced-by-params # replaced-by-params
+            resourceGroupName: dev-mod-accenture-crossplane-rg # replaced-by-params
+            sku:
+            - size: S1
+              tier: Standard # can be replaced-by-params
+          providerConfigRef: # replaced-by-params
+            name: wireless-car
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroupName
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: spec.forProvider.name
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-appserviceplan"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.location
+      toFieldPath: spec.forProvider.location
+      transforms:
+      - type: map
+        map:
+          us-west: West US
+          us-east: East US
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.environment
+      toFieldPath: spec.forProvider.tags.environment
+    - type: ToCompositeFieldPath
+      fromFieldPath: status.atProvider.id
+      toFieldPath: status.appServicePlanID
+      policy:
+        fromFieldPath: Required
+  - name: functionapp
+    base:
+      apiVersion: web.azure.jet.crossplane.io/v1alpha1
+      kind: FunctionApp
+      metadata:
+        name: function-app
+      spec:
+        forProvider:
+          appServicePlanId: replaced-by-patches #"/subscriptions/XXXX/resourceGroups/dev-mod-accenture-crossplane-rg/providers/Microsoft.Web/serverfarms/yyyyy"
+          location: West US
+          name: replaced-by-patches
+          resourceGroupName: replaced-by-patches
+          storageAccountAccessKeySecretRef:
+            key: primary_access_key # primary key string of the secret,*** Please Note, if you change connection key in the XRD then update here also 
+            name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
+            namespace: replaced-by-patches #hardcoded for now n but can be replaced by patches, as secrets are stored in upbound-system, but later we can change it
+          storageAccountName: #replaced by patches #myfunctaccnt1985 #${azurerm_storage_account.example.name} 
+        providerConfigRef:
+          name: replaced-by-patches #replaced by patches
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: status.appServicePlanID
+      toFieldPath: spec.forProvider.appServicePlanId #Variables passed as annotations
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.location
+      toFieldPath: spec.forProvider.location
+      transforms:
+      - type: map
+        map:
+          us-west: West US
+          us-east: East US
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: spec.forProvider.name
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-function-app"
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.resourceGroupName
+      toFieldPath: spec.forProvider.resourceGroupName
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.writeConnectionSecretToRef.name
+      toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.storageAccountAccessKeySecretRef.namespace
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.annotations[crossplane.io/external-name]
+      toFieldPath: spec.forProvider.storageAccountName
+    - fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.providerConfigRef.name
+      policy:
+        fromFieldPath: Required

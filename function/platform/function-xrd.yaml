@@ -1,0 +1,56 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xfunctions.runtime.cariad.net
+spec:
+  group: runtime.cariad.net
+  names:
+    kind: XFunction
+    plural: xfunctions
+  claimNames:
+    kind: Function
+    plural: functions
+  connectionSecretKeys:
+    - primary_connection_string # if changed, then change the value in Composition accordingly as well
+    - primary_access_key
+    - secondary_connection_string
+    - secondary_access_key
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  resourceGroupName:
+                    type: string
+                    description: "Maps to a resource group in Azure"
+                  location:
+                    type: string
+                    enum: ["us-west", "us-east"]
+                  environment:
+                    type: string
+                    enum: ["dev", "stage", "prod"]
+                required:
+                - resourceGroupName
+                - location
+                - environment
+            required:
+            - parameters
+          status:
+            type: object
+            properties:
+              appServicePlanID:
+                description: Azure app service plan ID
+                type: string
+              secretName:
+                description: Azure storage account's secret name
+                type: string
+            
