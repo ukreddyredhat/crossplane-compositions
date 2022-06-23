@@ -22,7 +22,7 @@ spec:
           purgeProtectionEnabled: false
           resourceGroupName: replaced-by-patches
           skuName: standard
-          softDeleteRetentionDays: 14
+          softDeleteRetentionDays: 7
           tenantId: 2d8cc149-4c57-462b-a1fb-6e548ffd73bd
           tags: # (Optional) A mapping of tags to assign to the resource.
             environment: dev # replaced-by-params
@@ -91,7 +91,7 @@ spec:
             - Delete
             - List
           tenantId: 2d8cc149-4c57-462b-a1fb-6e548ffd73bd
-          objectId: 4d9fff78-492d-4136-affd-a0c430ea7902
+          objectId: 90d1c7df-0395-40e9-96a8-3b8cfbf65ce2
           certificatePermissions:
             - Get
             - GetIssuers
