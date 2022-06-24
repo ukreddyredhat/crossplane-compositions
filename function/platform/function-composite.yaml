@@ -173,7 +173,7 @@ spec:
       fromFieldPath: spec.parameters.resourceGroupName
       toFieldPath: spec.forProvider.resourceGroupName
     - type: FromCompositeFieldPath
-      fromFieldPath: status.secretName
+      fromFieldPath: spec.writeConnectionSecretToRef.name
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
     - type: FromCompositeFieldPath
       fromFieldPath: spec.claimRef.namespace
