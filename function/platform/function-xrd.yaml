@@ -11,7 +11,7 @@ spec:
     kind: Function
     plural: functions
   connectionSecretKeys:
-    - primary_connection_string # if changed, then change the value in Composition accordingly as well
+    - primary_connection_string
     - primary_access_key
     - secondary_connection_string
     - secondary_access_key

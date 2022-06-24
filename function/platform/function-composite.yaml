@@ -71,6 +71,10 @@ spec:
     - type: ToCompositeFieldPath
       fromFieldPath: metadata.uid
       toFieldPath: status.secretName
+      transforms:
+      - type: string
+        string:
+          fmt: "%s-connection"
       policy:
         fromFieldPath: Required
     connectionDetails:
@@ -144,9 +148,9 @@ spec:
           name: replaced-by-patches
           resourceGroupName: replaced-by-patches
           storageAccountAccessKeySecretRef:
-            key: primary_access_key # primary key string of the secret,*** Please Note, if you change connection key in the XRD then update here also 
+            key: attribute.primary_access_key # primary key string of the secret
             name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
-            namespace: upbound-system #secrets are stored in upbound-system, see writeConnectionSecretsToNamespace above
+            namespace: replaced-by-patches #secrets are stored in upbound-system, see writeConnectionSecretsToNamespace above
           storageAccountName: #replaced by patches #myfunctaccnt1985 #${azurerm_storage_account.example.name} 
         providerConfigRef:
           name: replaced-by-patches #replaced by patches
@@ -173,7 +177,7 @@ spec:
       fromFieldPath: spec.parameters.resourceGroupName
       toFieldPath: spec.forProvider.resourceGroupName
     - type: FromCompositeFieldPath
-      fromFieldPath: spec.writeConnectionSecretToRef.name
+      fromFieldPath: status.secretName
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
     - type: FromCompositeFieldPath
       fromFieldPath: spec.claimRef.namespace
