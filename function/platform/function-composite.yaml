@@ -144,12 +144,10 @@ spec:
           name: replaced-by-patches
           resourceGroupName: replaced-by-patches
           storageAccountAccessKeySecretRef:
-            key: primary_access_key # primary key string of the secret
+            key: attribute.primary_access_key # primary key string of the secret
             name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
-            namespace: upbound-system #secrets are stored in upbound-system, see writeConnectionSecretsToNamespace above
-          storageAccountName: #replaced by patches #myfunctaccnt1985 #${azurerm_storage_account.example.name} 
-          tags:
-            secretName: replaced-by-patches
+            namespace: replaced-by-patches
+          storageAccountName: #replaced by patches
         providerConfigRef:
           name: replaced-by-patches #replaced by patches
     patches:
@@ -175,8 +173,11 @@ spec:
       fromFieldPath: spec.parameters.resourceGroupName
       toFieldPath: spec.forProvider.resourceGroupName
     - type: FromCompositeFieldPath
-      fromFieldPath: spec.writeConnectionSecretToRef.name
+      fromFieldPath: status.secretName
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.claimRef.namespace
+      toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.namespace
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
       toFieldPath: spec.forProvider.storageAccountName
@@ -184,7 +185,4 @@ spec:
       toFieldPath: spec.providerConfigRef.name
       policy:
         fromFieldPath: Required
-    - type: FromCompositeFieldPath
-      fromFieldPath: status.secretName
-      toFieldPath: spec.forProvider.tags.secretName
     
