@@ -69,12 +69,8 @@ spec:
       fromFieldPath: spec.claimRef.namespace
       toFieldPath: spec.providerConfigRef.name
     - type: ToCompositeFieldPath
-      fromFieldPath: metadata.uid
+      fromFieldPath: spec.writeConnectionSecretToRef.name
       toFieldPath: status.secretName
-      transforms:
-      - type: string
-        string:
-          fmt: "%s-connection"
       policy:
         fromFieldPath: Required
     connectionDetails:
@@ -148,10 +144,12 @@ spec:
           name: replaced-by-patches
           resourceGroupName: replaced-by-patches
           storageAccountAccessKeySecretRef:
-            key: attribute.primary_access_key # primary key string of the secret
+            key: primary_access_key # primary key string of the secret
             name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
-            namespace: replaced-by-patches #secrets are stored in upbound-system, see writeConnectionSecretsToNamespace above
+            namespace: upbound-system #secrets are stored in upbound-system, see writeConnectionSecretsToNamespace above
           storageAccountName: #replaced by patches #myfunctaccnt1985 #${azurerm_storage_account.example.name} 
+          tags:
+            secretName: replaced-by-patches
         providerConfigRef:
           name: replaced-by-patches #replaced by patches
     patches:
@@ -177,11 +175,8 @@ spec:
       fromFieldPath: spec.parameters.resourceGroupName
       toFieldPath: spec.forProvider.resourceGroupName
     - type: FromCompositeFieldPath
-      fromFieldPath: status.secretName
+      fromFieldPath: spec.writeConnectionSecretToRef.name
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
-    - type: FromCompositeFieldPath
-      fromFieldPath: spec.claimRef.namespace
-      toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.namespace
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
       toFieldPath: spec.forProvider.storageAccountName
@@ -189,3 +184,7 @@ spec:
       toFieldPath: spec.providerConfigRef.name
       policy:
         fromFieldPath: Required
+    - type: FromCompositeFieldPath
+      fromFieldPath: status.secretName
+      toFieldPath: spec.forProvider.tags.secretName
+    
