@@ -273,6 +273,8 @@ spec:
     - type: FromCompositeFieldPath
       fromFieldPath: status.secretName
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.name
+      policy:
+        fromFieldPath: Required
     - type: FromCompositeFieldPath
       fromFieldPath: spec.claimRef.namespace
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.namespace
