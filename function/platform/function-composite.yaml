@@ -19,15 +19,15 @@ spec:
         name: function-app-storage-account
       spec:
         forProvider:
-          accountReplicationType: GRS # Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS. 
+          accountReplicationType: LRS # Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS. 
           accountTier: Standard # Defines the Tier to use for this storage account. Valid options are Standard and Premium. For BlockBlobStorage and FileStorage accounts only Premium is valid.
           location: West US # patched
-          resourceGroupName: replaced-by-patches
+          resourceGroupName: replaced-by-patches # patched
           tags: # (Optional) A mapping of tags to assign to the resource.
             environment: dev # patched
         writeConnectionSecretToRef:
-          namespace: replaced-by-patches # patched
-          name: replaced-by-patches # patched
+          namespace: wireless-car # patched
+          name: storage-acc-conn # patched
     patches:
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
@@ -82,23 +82,6 @@ spec:
       fromConnectionSecretKey: attribute.secondary_connection_string
     - name: secondary_access_key
       fromConnectionSecretKey: attribute.secondary_access_key
-  - name: container
-    base:
-      apiVersion: storage.azure.jet.crossplane.io/v1alpha2
-      kind: Container
-      metadata:
-        name: function-app-container
-      spec:
-        forProvider:
-          containerAccessType: private
-          storageAccountNameSelector:
-            matchControllerRef: true
-          providerConfigRef:
-            name: replaced-by-patches
-    patches:
-    - type: FromCompositeFieldPath
-      fromFieldPath: spec.claimRef.namespace
-      toFieldPath: spec.providerConfigRef.name      
   - name: appserviceplan
     base:
       apiVersion: web.azure.jet.crossplane.io/v1alpha1
@@ -114,7 +97,7 @@ spec:
           - size: Y1
             tier: Dynamic
           kind: FunctionApp
-          reserved: true # false if OS is Windows, true is OS is Linux
+          reserved: false # false if OS is Windows, true is OS is Linux
           maximumElasticWorkerCount: 1
           tags: # (Optional) A mapping of tags to assign to the resource.
             environment: dev # replaced-by-patches
@@ -133,7 +116,7 @@ spec:
       transforms:
       - type: string
         string:
-          fmt: "%s-appserviceplan"
+          fmt: "ASP-%s"
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.location
       toFieldPath: spec.forProvider.location
@@ -145,9 +128,6 @@ spec:
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.environment
       toFieldPath: spec.forProvider.tags.environment
-    - type: FromCompositeFieldPath
-      fromFieldPath: spec.claimRef.namespace
-      toFieldPath: spec.providerConfigRef.name
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.environment
       toFieldPath: spec.forProvider.tags.environment
@@ -174,15 +154,16 @@ spec:
             name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
             namespace: replaced-by-patches
           storageAccountName: #patched
-          osType: linux # empty if Windows, linux for Linux
-          version: ~4 # required for Linux Function App
+          # osType: linux # empty if Windows, linux for Linux
+          # version: ~4 # required for Linux Function App
           httpsOnly: false
           appSettings:
-            FUNCTIONS_WORKER_RUNTIME: python
+            FUNCTIONS_WORKER_RUNTIME: powershell
+            FUNCTIONS_EXTENSION_VERSION: ~4
           siteConfig:
           - alwaysOn: false
             http2Enabled: false
-            linuxFxVersion: "Python|3.9"
+            # linuxFxVersion: "Python|3.9"
             appScaleLimit: 200
             elasticInstanceMinimum: 0
           tags:
