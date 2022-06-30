@@ -21,13 +21,13 @@ spec:
         forProvider:
           accountReplicationType: GRS # Defines the type of replication to use for this storage account. Valid options are LRS, GRS, RAGRS, ZRS, GZRS and RAGZRS. 
           accountTier: Standard # Defines the Tier to use for this storage account. Valid options are Standard and Premium. For BlockBlobStorage and FileStorage accounts only Premium is valid.
-          location: West US
+          location: West US # patched
           resourceGroupName: replaced-by-patches
           tags: # (Optional) A mapping of tags to assign to the resource.
-            environment: dev # replaced-by-patches
+            environment: dev # patched
         writeConnectionSecretToRef:
-          namespace: replaced-by-patches #replaced by patches
-          name: replaced-by-patches #replaced by patches
+          namespace: replaced-by-patches # patched
+          name: replaced-by-patches # patched
     patches:
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
@@ -156,63 +156,6 @@ spec:
       toFieldPath: status.appServicePlanID
       policy:
         fromFieldPath: Required
-  # - name: appinsight
-  #   base:
-  #     apiVersion: insights.azure.jet.crossplane.io/v1alpha1
-  #     kind: ApplicationInsights
-  #     metadata:
-  #       name: application-insight
-  #     spec:
-  #       forProvider:
-  #         applicationType: web
-  #         location: replaced-by-patches
-  #         name: replaced-by-patches
-  #         resourceGroupName: replaced-by-patches
-  #         retentionInDays: 90
-  #         tags:
-  #           environment: replaced-by-patches # replaced-by-patches
-  #           monitoring: functionapp
-  #       providerConfigRef:
-  #         name: replaced-by-patches
-  #       writeConnectionSecretToRef:
-  #         name: replaced-by-patches
-  #         namespace: replaced-by-patches
-  #   patches:
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: metadata.annotations[crossplane.io/external-name]
-  #     toFieldPath: spec.forProvider.name
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: spec.parameters.location
-  #     toFieldPath: spec.forProvider.location
-  #     transforms:
-  #     - type: map
-  #       map:
-  #         us-west: West US
-  #         us-east: East US
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: spec.parameters.resourceGroupName
-  #     toFieldPath: spec.forProvider.resourceGroupName
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: spec.parameters.environment
-  #     toFieldPath: spec.forProvider.tags.environment
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: spec.claimRef.namespace
-  #     toFieldPath: spec.providerConfigRef.name
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: metadata.uid
-  #     toFieldPath: spec.writeConnectionSecretToRef.name
-  #     transforms:
-  #     - type: string
-  #       string:
-  #         fmt: "%s-appinsight-instrumentkey"
-  #   - type: FromCompositeFieldPath
-  #     fromFieldPath: spec.claimRef.namespace
-  #     toFieldPath: spec.writeConnectionSecretToRef.namespace
-  #   connectionDetails:
-  #   - name: appinsight_instrument_key
-  #     fromConnectionSecretKey: attribute.instrumentation_key
-  #   - name: appinsight_connection_string
-  #     fromConnectionSecretKey: attribute.connection_string
   - name: functionapp
     base:
       apiVersion: web.azure.jet.crossplane.io/v1alpha1
@@ -230,14 +173,12 @@ spec:
             key: attribute.primary_access_key # primary key string of the secret
             name: replaced-by-patches # azure-storage-account-secret # #replaces by patches name of the secret
             namespace: replaced-by-patches
-          storageAccountName: #replaced by patches
+          storageAccountName: #patched
           osType: linux # empty if Windows, linux for Linux
           version: ~4 # required for Linux Function App
           httpsOnly: false
           appSettings:
             FUNCTIONS_WORKER_RUNTIME: python
-            # APPINSIGHTS_INSTRUMENTATIONKEY: replaced-by-patches
-            # APPLICATIONINSIGHTS_CONNECTION_STRING: replaced-by-patches
           siteConfig:
           - alwaysOn: false
             http2Enabled: false
@@ -247,7 +188,7 @@ spec:
           tags:
             environment: replaced-by-patches
         providerConfigRef:
-          name: replaced-by-patches #replaced by patches
+          name: replaced-by-patches #patched
     patches:
     - type: FromCompositeFieldPath
       fromFieldPath: status.appServicePlanID
@@ -278,6 +219,8 @@ spec:
     - type: FromCompositeFieldPath
       fromFieldPath: spec.claimRef.namespace
       toFieldPath: spec.forProvider.storageAccountAccessKeySecretRef.namespace
+      policy:
+        fromFieldPath: Required
     - type: FromCompositeFieldPath
       fromFieldPath: metadata.annotations[crossplane.io/external-name]
       toFieldPath: spec.forProvider.storageAccountName
@@ -288,4 +231,3 @@ spec:
     - type: FromCompositeFieldPath
       fromFieldPath: spec.parameters.environment
       toFieldPath: spec.forProvider.tags.environment
-    

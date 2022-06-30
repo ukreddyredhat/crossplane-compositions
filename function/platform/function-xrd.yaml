@@ -15,8 +15,6 @@ spec:
     - primary_access_key
     - secondary_connection_string
     - secondary_access_key
-    # - appinsight_instrument_key
-    # - appinsight_connection_string
   versions:
   - name: v1alpha1
     served: true
@@ -55,10 +53,3 @@ spec:
               secretName:
                 description: Azure storage account's secret name
                 type: string
-              # instrumentKey:
-              #   description: Azure application insight instrumentation key
-              #   type: string
-              # appInsightConnection:
-              #   description: Azure application insight connection string
-              #   type: string
-            
