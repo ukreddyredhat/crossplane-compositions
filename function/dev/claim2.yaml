@@ -1,0 +1,18 @@
+apiVersion: runtime.cariad.net/v1alpha1
+kind: Function
+metadata:
+  name: residency-function-2
+  annotations:
+    # must not have uppercase or any special symbols 
+    # Only alphanumeric, no special characters allowed. Limit the function name to 32 characters to avoid naming collisions. For more information: https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftweb
+    crossplane.io/external-name: residencyfunctiondemo2
+spec:
+  parameters:
+    location: us-west
+    resourceGroupName: dev-mod-accenture-crossplane-rg
+    environment: dev # choose from dev, stage, prod (if prod, then Tier is Premium)
+  compositionSelector:
+    matchLabels:
+      provider: azure
+  writeConnectionSecretToRef:
+    name: residency-function-conn-2
