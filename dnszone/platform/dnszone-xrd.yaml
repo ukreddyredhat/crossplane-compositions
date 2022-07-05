@@ -1,0 +1,32 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnetworks.runtime.cariad.net
+spec:
+  group: runtime.cariad.net
+  names:
+    kind: XNetwork
+    plural: xnetwork
+  claimNames:
+    kind: Network
+    plural: networks
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              parameters:
+                type: object
+                properties:
+                  resourceGroup:
+                    type: string
+                required:
+                - resourceGroup
+            required:
+            - parameters

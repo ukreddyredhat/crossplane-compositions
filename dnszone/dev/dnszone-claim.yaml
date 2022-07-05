@@ -1,0 +1,12 @@
+apiVersion: runtime.cariad.net/v1alpha1
+kind: Network
+metadata:
+  name: residency-dnszone
+  annotations:
+    crossplane.io/external-name: residency.vwac.net
+spec:
+  parameters:
+    resourceGroup: dev-mod-accenture-crossplane-rg
+  compositionSelector:
+    matchLabels:
+      provider: azure
