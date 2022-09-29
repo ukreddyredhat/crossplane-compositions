@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: asg-redhat-gitops-demo
+    server: 'https://kubernetes.default.svc'
+  orphanedResources:
+    warn: false
+  project: default
+  source:
+    path: deploy
+    repoURL: 'https://github.com/ukreddyredhat/tekton-argocd.git'
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      #- ApplyOutOfSyncOnly=true
+      - CreateNamespace=false
+      - PruneLast=true
+      - PrunePropagationPolicy=foreground
+      #- Replace=true
+      - FailOnSharedResource=true
+    automated:
+      prune: false
+      allowEmpty: false
+      selfHeal: false
+    always:
+      frequency: 5m
+      retry: false
